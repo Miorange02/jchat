@@ -61,6 +61,12 @@ public class MessageDao {
         return DBHelper.query(sql, this::mapRow, chatroomId, limit);
     }
 
+    // 模糊查询搜索消息
+    public List<Message> searchMessages(int chatroomId, String keyword) throws SQLException {
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE chatroom_id=? AND content LIKE ? ORDER BY created_at ASC";
+        return DBHelper.query(sql, this::mapRow, chatroomId, "%" + keyword + "%");
+    }
+
     // 行映射方法
     private Message mapRow(ResultSet rs) throws SQLException {
         Message message = new Message();

@@ -42,7 +42,6 @@ public class ChatServlet extends HttpServlet {
             request.getRequestDispatcher("/chat.jsp").forward(request, response);
 
         } catch (Exception e) {
-//            e.printStackTrace();
             handleError(request, response, e);
         }
     }

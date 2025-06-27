@@ -22,17 +22,17 @@
         </div>
         <div class="flex items-center space-x-4">
             <c:if test="${not empty sessionScope.user}">
-            <img src="static/avatar/${sessionScope.user.avatarUrl}" alt="用户头像"
-                 class="w-8 h-8 rounded-full object-cover border-2 border-white avatar-hover">
-            <span class="hidden md:inline-block font-semibold">${sessionScope.user.uname}</span>
-            <a href="#" class="nav-link">
-                <i class="fa fa-cog nav-link-icon"></i>
-                <span class="hidden md:inline-block">设置</span>
-            </a>
-            <a href="#" class="nav-link">
-                <i class="fa fa-sign-out nav-link-icon"></i>
-                <span class="hidden md:inline-block">登出</span>
-            </a>
+                <img src="static/avatar/${sessionScope.user.avatarUrl}" alt="用户头像"
+                     class="w-8 h-8 rounded-full object-cover border-2 border-white avatar-hover">
+                <span class="hidden md:inline-block font-semibold">${sessionScope.user.uname}</span>
+                <a href="#" class="nav-link">
+                    <i class="fa fa-cog nav-link-icon"></i>
+                    <span class="hidden md:inline-block">设置</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fa fa-sign-out nav-link-icon"></i>
+                    <span class="hidden md:inline-block">登出</span>
+                </a>
             </c:if>
         </div>
     </header>
@@ -61,41 +61,21 @@
             <div class="overflow-y-auto scrollbar-hide flex-1">
                 <!-- 活跃聊天室 -->
                 <c:forEach items="${chatrooms}" var="chatroom">
-                <div class="p-3 bg-primary/10 border-l-4 border-primary cursor-pointer transition-all hover:bg-primary/20">
-                    <div class="flex items-center">
-<%--                        <div class="relative mr-3">--%>
-<%--                            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">--%>
-<%--                                <i class="fa fa-users text-primary text-xl"></i>--%>
-<%--                            </div>--%>
-<%--                        </div>--%>
+                <div class="p-3 bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all hover:shadow-md hover:border-primary/30 group">
+                    <div class="flex items-center space-x-3">
                         <div class="flex-1 min-w-0">
-<%--                            <h3 class="font-semibold text-dark truncate">${chatroom.chatroom.rname}</h3>--%>
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-semibold text-gray-800 truncate">${chatroom.chatroom.rname}</h3>
+                                <span class="text-xs text-gray-400">${chatroom.chatroom.memberCount}人</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1 flex items-center">
+                                <i class="fa fa-user-circle mr-1 text-gray-400"></i>
+                                <span class="truncate">${chatroom.user.uname}</span>
+                            </p>
                         </div>
                     </div>
                 </div>
                 </c:forEach>
-<%--                <!-- 其他聊天室 -->--%>
-<%--                <div class="p-3 cursor-pointer transition-all hover:bg-gray-50">--%>
-<%--                    <div class="flex items-center">--%>
-<%--                        <div class="relative mr-3">--%>
-<%--                            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">--%>
-<%--                                <i class="fa fa-code text-purple-600 text-xl"></i>--%>
-<%--                            </div>--%>
-<%--                        </div>--%>
-<%--                        <div class="flex-1 min-w-0">--%>
-<%--                            <div class="flex justify-between items-center mb-1">--%>
-<%--                                <h3 class="font-semibold text-dark truncate">前端大师</h3>--%>
-<%--                                <span class="text-xs text-gray-medium">昨天</span>--%>
-<%--                            </div>--%>
-<%--                            <div class="flex justify-between items-center">--%>
-<%--                                <p class="text-sm text-gray-medium truncate">--%>
-<%--                                    李四: Tailwind CSS太好用了！--%>
-<%--                                </p>--%>
-<%--                            </div>--%>
-<%--                        </div>--%>
-<%--                    </div>--%>
-<%--                </div>--%>
-<%--            </div>--%>
         </aside>
 
         <!-- 中间聊天区域 -->
@@ -113,7 +93,7 @@
                     </div>
                     <div>
                         <h2 class="font-semibold">Web开发者社区</h2>
-                        <p class="text-xs text-gray-medium">52位成员</p>
+                        <p class="text-xs text-gray-medium">${chatroom.chatroom.memberCount}</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -185,13 +165,12 @@
         <!-- 右侧成员列表 hidden xl:block-->
         <aside class="members-list bg-white ">
             <div class="m-2 text-xs text-gray-medium bg-gray-100 rounded p-2" id="chatroom-desc">
-                    这里是Web开发者社区，欢迎大家交流前端、后端和全栈技术！
-                </div>
+                这里是Web开发者社区，欢迎大家交流前端、后端和全栈技术！
+            </div>
             <!-- 成员列表头部 -->
             <div class="p-4 border-b border-gray-light">
                 <div class="flex justify-between items-center">
                     <h2 class="font-semibold">成员列表</h2>
-                    <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">52位</span>
                 </div>
                 <div class="relative mt-3">
                     <input type="text" placeholder="搜索成员"
@@ -276,7 +255,8 @@
 </div>
 
 <!-- 常驻公告板 -->
-<div id="ann-board-container" class="fixed top-4 right-4 bg-white border border-gray-300 rounded-lg p-4 w-60 shadow-xl z-50">
+<div id="ann-board-container"
+     class="fixed top-4 right-4 bg-white border border-gray-300 rounded-lg p-4 w-60 shadow-xl z-50">
     <div class="flex justify-between items-center mb-2">
         <h3 class="font-semibold">系统公告</h3>
         <button class="text-gray-600 hover:text-red-500" id="close-ann-board">

@@ -5,7 +5,6 @@ import edu.csust.entity.ChatroomUser;
 import edu.csust.entity.User;
 import edu.csust.util.DBHelper;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +33,7 @@ public class ChatroomUserDao {
 
     // 获取用户加入的所有聊天室
     public List<ChatroomUser> findByUserId(int userId) throws SQLException {
-        String sql = "SELECT cu.*, c.*, u.uname " +  // 移除了as creator_name
+        String sql = "SELECT cu.*, c.*, u.* " +
                 "FROM " + TABLE_NAME + " cu " +
                 "JOIN chatroom c ON cu.room_id = c.id " +
                 "JOIN user u ON c.creator_id = u.id " +
@@ -44,12 +43,12 @@ public class ChatroomUserDao {
 
     // 获取聊天室的所有成员
     public List<ChatroomUser> findByRoomId(int roomId) throws SQLException {
-        String sql = "SELECT cu.*, u.* FROM chatroom_user cu \n" +
-                "JOIN user u ON cu.user_id = u.id \n" +
+        String sql = "SELECT cu.*, u.* " +
+                "FROM " + TABLE_NAME + " cu " +
+                "JOIN user u ON cu.user_id = u.id " +
                 "WHERE cu.room_id=?";
         return DBHelper.query(sql, this::mapRowWithAssociations, roomId);
     }
-
 
     // 行映射方法
     private ChatroomUser mapRow(ResultSet rs) throws SQLException {
@@ -60,36 +59,40 @@ public class ChatroomUserDao {
         return chatroomUser;
     }
 
+    // 完整的行映射方法（处理关联对象）
     private ChatroomUser mapRowWithAssociations(ResultSet rs) throws SQLException {
-        ResultSetMetaData metaData = rs.getMetaData();
-        for(int i=1; i<=metaData.getColumnCount(); i++) {
-            System.out.println("Column " + i + ": " + metaData.getColumnName(i));
-        }
         ChatroomUser chatroomUser = new ChatroomUser();
         chatroomUser.setUserId(rs.getInt("user_id"));
         chatroomUser.setRoomId(rs.getInt("room_id"));
         chatroomUser.setJoinTime(rs.getObject("join_time", LocalDateTime.class));
 
-        // 设置关联的Chatroom
-        Chatroom chatroom = new Chatroom();
-        chatroom.setId(rs.getInt("id"));
-        chatroom.setRname(rs.getString("rname"));
-        chatroom.setDescription(rs.getString("description"));
-        chatroom.setCreator(rs.getInt("creator_id"));
-        chatroom.setMemberCount(rs.getInt("member_count"));
-        chatroom.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
-        chatroomUser.setChatroom(chatroom);
+        try {
+            // 设置关联的User对象
+            User user = new User();
+            user.setId(rs.getInt("u.id"));
+            user.setUname(rs.getString("u.uname"));
+            user.setEmail(rs.getString("u.email"));
+            user.setAvatarUrl(rs.getString("u.avatar_url"));
+            user.setStatus(rs.getString("u.status"));
+            user.setLastActive(rs.getObject("u.last_active", LocalDateTime.class));
+            chatroomUser.setUser(user);
 
-        // 设置关联的User
-        User user = new User();
-        user.setId(rs.getInt("creator_id"));
-        user.setUname(rs.getString("uname"));
-        user.setEmail(rs.getString("email"));
-        user.setAvatarUrl(rs.getString("avatar_url"));
-        user.setStatus(rs.getString("status"));
-        user.setLastActive(rs.getObject("last_active", LocalDateTime.class));
-        chatroomUser.setUser(user);
-
+            // 尝试设置关联的Chatroom对象（仅findByUserId需要）
+            try {
+                Chatroom chatroom = new Chatroom();
+                chatroom.setId(rs.getInt("c.id"));
+                chatroom.setRname(rs.getString("c.rname"));
+                chatroom.setDescription(rs.getString("c.description"));
+                chatroom.setCreator(rs.getInt("c.creator_id"));
+                chatroom.setMemberCount(rs.getInt("c.member_count"));
+                chatroom.setCreatedAt(rs.getObject("c.created_at", LocalDateTime.class));
+                chatroomUser.setChatroom(chatroom);
+            } catch (SQLException e) {
+                // 如果c.*列不存在（如findByRoomId查询），则忽略
+            }
+        } catch (SQLException e) {
+            throw new SQLException("映射关联对象时出错", e);
+        }
 
         return chatroomUser;
     }
