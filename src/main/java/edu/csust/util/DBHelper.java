@@ -26,12 +26,9 @@ public class DBHelper {
 
     public static Connection getConnection(){
         try {
-            System.out.println("尝试连接数据库，URL: " + url);
             Connection connection = DriverManager.getConnection(url, username, password);
-            System.out.println("数据库连接成功");
             return connection;
         } catch (SQLException e) {
-            System.err.println("数据库连接失败:");
             e.printStackTrace();
         }
         return null;

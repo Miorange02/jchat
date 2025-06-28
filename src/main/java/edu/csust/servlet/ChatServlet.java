@@ -24,8 +24,6 @@ public class ChatServlet extends HttpServlet {
         }
 
         try {
-            System.out.println("登录成功，设置session user: " + request.getSession().getAttribute("user"));
-
             // 获取用户聊天室和消息数据
             List<ChatroomUser> chatrooms = chatService.getUserChatrooms(currentUser.getId());
             int chatroomId = getChatroomIdFromRequest(request, chatrooms);

@@ -11,6 +11,14 @@ import java.util.List;
 public class UserDao implements BaseDao<User> {
     private static final String TABLE_NAME = "user";
 
+    public int updateStatus(User user) throws SQLException {
+        String sql = "UPDATE " + TABLE_NAME + " SET status=?, last_active=? WHERE id=?";
+        return DBHelper.executeUpdate(sql,
+                user.getStatus(),
+                user.getLastActive(),
+                user.getId());
+    }
+
     @Override
     public int insert(User user) throws SQLException {
         String sql = "INSERT INTO " + TABLE_NAME + " (uname, password, email, avatar_url) VALUES (?, ?, ?, ?)";

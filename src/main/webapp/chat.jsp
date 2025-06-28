@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -29,7 +30,7 @@
                     <i class="fa fa-cog nav-link-icon"></i>
                     <span class="hidden md:inline-block">设置</span>
                 </a>
-                <a href="#" class="nav-link">
+                <a href="logout" class="nav-link">
                     <i class="fa fa-sign-out nav-link-icon"></i>
                     <span class="hidden md:inline-block">登出</span>
                 </a>
@@ -105,10 +106,6 @@
 
             <!-- 聊天消息区域 -->
             <div class="flex-1 p-4 overflow-y-auto scrollbar-hide" id="chat-messages">
-                <!-- 日期分隔线 -->
-                <div class="flex justify-center my-4">
-                    <span class="bg-white text-gray-medium text-xs px-3 py-1 rounded-full shadow-sm">今天</span>
-                </div>
 
                 <!-- 系统消息 -->
                 <div class="flex justify-center mb-4">
@@ -165,7 +162,7 @@
         <!-- 右侧成员列表 hidden xl:block-->
         <aside class="members-list bg-white ">
             <div class="m-2 text-xs text-gray-medium bg-gray-100 rounded p-2" id="chatroom-desc">
-                这里是Web开发者社区，欢迎大家交流前端、后端和全栈技术！
+                ${chatroom.chatroom.description}
             </div>
             <!-- 成员列表头部 -->
             <div class="p-4 border-b border-gray-light">
