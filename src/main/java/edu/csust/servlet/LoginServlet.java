@@ -39,12 +39,8 @@ public class LoginServlet extends HttpServlet {
             User user = authenticateUser(uname, password);
 
             if (user != null) {
-                // 在登录成功后设置用户属性
                 userService.updateUserStatus(user, "online");
                 req.getSession().setAttribute("user", user);
-                // 在登录成功部分添加
-                req.getSession().setAttribute("username", user.getUname());
-
                 resp.sendRedirect(req.getContextPath() + "/chat");
             } else {
                 handleLoginFailure(req, resp);

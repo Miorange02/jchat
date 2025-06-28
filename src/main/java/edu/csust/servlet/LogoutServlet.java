@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 public class LogoutServlet extends HttpServlet {
     private UserService userService = new UserService();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             // 获取当前用户
             User user = (User) request.getSession().getAttribute("user");
@@ -22,8 +23,7 @@ public class LogoutServlet extends HttpServlet {
                 // 更新用户状态为离线
                 user.setStatus("offline");
                 user.setLastActive(LocalDateTime.now());
-                userService.updateUserStatus(user, "offline");
-                request.getSession().removeAttribute("username"); // 新增清理
+                userService.updateUserStatus(user,"offline");
             }
             
             // 使session失效
@@ -35,8 +35,6 @@ public class LogoutServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("error", "登出失败");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
