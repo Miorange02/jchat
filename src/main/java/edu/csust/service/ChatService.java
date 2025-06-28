@@ -9,7 +9,10 @@ import edu.csust.entity.ChatroomUser;
 import edu.csust.entity.Message;
 import edu.csust.entity.User;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatService {
     private ChatroomDao chatroomDao = new ChatroomDao();
@@ -41,8 +44,16 @@ public class ChatService {
     }
 
     // 获取指定聊天室的消息
-    public List<Message> getChatroomMessages(int chatroomId) throws Exception {
-        return messageDao.findByChatroomId(chatroomId);
+    // 修改获取消息方法，添加异常处理
+    public List<Message> getChatroomMessages(int chatroomId) {
+        try {
+            return messageDao.findByChatroomId(chatroomId).stream()
+                .sorted(Comparator.comparing(Message::getCreatedAt)) // 确保时间排序
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("获取消息失败: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     // 创建新聊天室
@@ -65,7 +76,16 @@ public class ChatService {
     }
 
     // 发送消息
-    public int sendMessage(Message message) throws Exception {
-        return messageDao.insert(message);
+    public void sendMessage(Message message) {
+        try {
+            // 添加字段验证
+            if (message.getChatroomId() == null || message.getUserId() == null) {
+                throw new IllegalArgumentException("消息缺少必要字段");
+            }
+            messageDao.insert(message);
+        } catch (Exception e) {
+            System.err.println("存储消息失败: " + e.getMessage());
+            throw new RuntimeException("消息发送失败", e);
+        }
     }
 }

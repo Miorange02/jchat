@@ -11,11 +11,12 @@ import java.util.Set;
 public class AuthFilter implements Filter {
     // Java 8兼容的初始化方式
     private static final Set<String> ALLOWED_PATHS = new HashSet<>(Arrays.asList(
-        "/login",
-        "/register",
-        "/static",
-        "/login.jsp",
-        "/register.jsp"
+            "/login",
+            "/register",
+            "/static",
+            "/login.jsp",
+            "/register.jsp",
+            "test.html"
     ));
 
     @Override

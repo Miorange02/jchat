@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @ToString
 @NoArgsConstructor
@@ -18,4 +19,11 @@ public class Message {
     private String content;
     private String type = "text"; // "text" 或 "system"
     private LocalDateTime createdAt;
+
+    private User user;
+
+    public String getFormattedTime() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm");
+        return createdAt != null ? createdAt.format(formatter) : "未知时间";
+    }
 }

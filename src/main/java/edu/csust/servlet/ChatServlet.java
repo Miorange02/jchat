@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet("/chat")
@@ -34,14 +35,25 @@ public class ChatServlet extends HttpServlet {
             List<ChatroomUser> members = chatService.getChatroomMembers(chatroomId);
             List<Message> messages = chatService.getChatroomMessages(chatroomId);
 
+            // 新增时间处理逻辑
+            messages.forEach(msg -> {
+                if(msg.getCreatedAt() == null) {
+                    msg.setCreatedAt(LocalDateTime.now());
+                }
+            });
+
             // 设置请求属性
             request.setAttribute("chatrooms", chatrooms);
+            request.setAttribute("currentUserId", currentUser.getId());
             request.setAttribute("messages", messages);
             request.setAttribute("members", members);
+            // 在service方法中
             request.setAttribute("currentChatroomId", chatroomId);
-            request.setAttribute("currentChatroom", currentChatroom); // 添加当前聊天室对象
+            // 添加日志输出
+            System.out.println("[ChatServlet] 当前聊天室ID: " + chatroomId
+                + ", 用户ID: " + currentUser.getId());
+            request.setAttribute("currentChatroom", currentChatroom);
 
-            // 转发到聊天页面
             request.getRequestDispatcher("/chat.jsp").forward(request, response);
 
         } catch (Exception e) {

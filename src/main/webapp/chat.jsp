@@ -11,10 +11,14 @@
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/css/index.css">
     <script src="static/js/index.js"></script>
+    <script src="static/js/ws.js"></script>
     <script>
-        // 全局变量，用于JS访问
-        var currentUserId = ${not empty sessionScope.user ? sessionScope.user.id : 0};
-        var currentChatroomId = ${currentChatroomId};
+        // 统一全局变量声明方式
+        window.appConfig = {
+            currentUserId: ${not empty sessionScope.user ? sessionScope.user.id : 0},
+            currentChatroomId: ${not empty currentChatroomId ? currentChatroomId : 0}
+        };
+        console.log('当前聊天室ID:', window.appConfig.currentChatroomId, '用户ID:', window.appConfig.currentUserId);
     </script>
 </head>
 <body class="bg-gray-light relative">
@@ -105,47 +109,31 @@
                         <p class="text-xs text-gray-medium">${currentChatroom.memberCount} 成员</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button class="text-xl hover:text-primary transition-colors" id="search-chat-btn">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </div>
             </div>
 
             <!-- 聊天消息区域 -->
+            <!-- 消息区域 -->
             <div class="flex-1 p-4 overflow-y-auto scrollbar-hide" id="chat-messages">
+                <c:forEach items="${messages}" var="msg">
+                    <c:choose>
+                        <%-- 系统消息处理 --%>
+                        <c:when test="${msg.type eq 'system'}">
+                            <div class="flex justify-center mb-4">
+                                <div class="bg-gray-200 text-gray-600 text-xs px-3 py-1 rounded-full">
+                                    ${msg.content}
+                                </div>
+                            </div>
+                        </c:when>
 
-                <!-- 系统消息 -->
-                <div class="flex justify-center mb-4">
-                    <div class="bg-gray-200 text-gray-medium text-xs px-3 py-1 rounded-full">
-                        你加入了聊天室
-                    </div>
-                </div>
-
-                <!-- 成员消息 -->
-                <div class="flex items-end mb-4 message-animation">
-                    <img src="https://picsum.photos/id/1027/100/100" alt="张三" class="w-8 h-8 rounded-full mr-2">
-                    <div class="message-in p-3 max-w-[80%] shadow-sm">
-                        <div class="flex items-center mb-1">
-                            <h4 class="font-medium text-primary">张三</h4>
-                            <span class="text-xs text-gray-medium ml-2">12:15 PM</span>
-                        </div>
-                        <p>早上好！有人看过React最新版本的新特性吗？</p>
-                    </div>
-                </div>
-
-
-                <!-- 我的消息 -->
-                <div class="flex items-end justify-end mb-4 message-animation">
-                    <div class="message-out p-3 max-w-[80%] shadow-sm">
-                        <div class="flex items-center justify-end mb-1">
-                            <span class="text-xs text-gray-medium mr-2">12:30 PM</span>
-                            <h4 class="font-medium text-dark">David</h4>
-                        </div>
-                        <p>我昨天刚升级了我的项目，目前运行得很好！</p>
-                    </div>
-                </div>
+                        <c:otherwise>
+                            <div class="flex items-end mb-4 ${msg.user.id eq currentUserId ? 'justify-end' : ''}">
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
             </div>
+
+
 
             <!-- 消息输入区域 -->
             <div class="bg-white p-4 border-t border-gray-light">
@@ -166,11 +154,6 @@
             <div class="p-4 border-b border-gray-light">
                 <div class="flex justify-between items-center">
                     <h2 class="font-semibold">成员列表</h2>
-                </div>
-                <div class="relative mt-3">
-                    <input type="text" placeholder="搜索成员"
-                           class="w-full py-2 pl-10 pr-4 rounded-lg bg-gray-light focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
-                    <i class="fa fa-search absolute left-3 top-3 text-gray-medium"></i>
                 </div>
             </div>
 
@@ -223,4 +206,7 @@
     </div>
 </div>
 </body>
-</html>
+</html></html>
+<c:if test="${empty messages}">
+    <div class="text-center text-gray-500 mt-4">暂无历史消息</div>
+</c:if></html>
