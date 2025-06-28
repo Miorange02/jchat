@@ -55,6 +55,10 @@ public class ChatService {
         return chatroomDao.searchByName(keyword);
     }
 
+    public Chatroom getChatroomById(int chatroomId) throws Exception {
+        return chatroomDao.findById(chatroomId);
+    }
+
     // 加入聊天室
     public int joinChatroom(int userId, int chatroomId) throws Exception {
         return chatroomUserDao.addUserToRoom(userId, chatroomId);

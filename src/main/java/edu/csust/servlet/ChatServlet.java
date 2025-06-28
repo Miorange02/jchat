@@ -1,5 +1,6 @@
 package edu.csust.servlet;
 
+import edu.csust.entity.Chatroom;
 import edu.csust.entity.ChatroomUser;
 import edu.csust.entity.Message;
 import edu.csust.entity.User;
@@ -27,6 +28,9 @@ public class ChatServlet extends HttpServlet {
             // 获取用户聊天室和消息数据
             List<ChatroomUser> chatrooms = chatService.getUserChatrooms(currentUser.getId());
             int chatroomId = getChatroomIdFromRequest(request, chatrooms);
+
+            // 获取当前聊天室对象
+            Chatroom currentChatroom = chatService.getChatroomById(chatroomId);
             List<ChatroomUser> members = chatService.getChatroomMembers(chatroomId);
             List<Message> messages = chatService.getChatroomMessages(chatroomId);
 
@@ -35,6 +39,7 @@ public class ChatServlet extends HttpServlet {
             request.setAttribute("messages", messages);
             request.setAttribute("members", members);
             request.setAttribute("currentChatroomId", chatroomId);
+            request.setAttribute("currentChatroom", currentChatroom); // 添加当前聊天室对象
 
             // 转发到聊天页面
             request.getRequestDispatcher("/chat.jsp").forward(request, response);

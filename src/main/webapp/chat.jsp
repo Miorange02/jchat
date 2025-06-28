@@ -11,7 +11,12 @@
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/css/index.css">
     <script src="static/js/index.js"></script>
-
+    <script>
+        // 全局变量，用于JS访问
+        var currentUserId = ${not empty sessionScope.user ? sessionScope.user.id : 0};
+        var currentChatroomId = ${currentChatroomId};
+    </script>
+</head>
 <body class="bg-gray-light relative">
 <div class="shadow-2xl page-container w-2/3 mx-auto">
     <header class="mt-5 rounded-lg bg-primary text-white shadow-md h-16 flex items-center justify-between px-6">
@@ -62,7 +67,10 @@
             <div class="overflow-y-auto scrollbar-hide flex-1">
                 <!-- 活跃聊天室 -->
                 <c:forEach items="${chatrooms}" var="chatroom">
-                <div class="p-3 bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all hover:shadow-md hover:border-primary/8-0 group">
+                <div class="p-3 bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all hover:shadow-md hover:border-primary/80 group
+    ${chatroom.chatroom.id == currentChatroomId ? 'bg-blue-50 border-primary' : ''}"
+                     onclick="window.changeChatroom(${chatroom.chatroom.id})"
+                     data-room-id="${chatroom.chatroom.id}">
                     <div class="flex items-center space-x-3">
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-center">
@@ -93,8 +101,8 @@
                         </div>
                     </div>
                     <div>
-                        <h2 class="font-semibold">Web开发者社区</h2>
-                        <p class="text-xs text-gray-medium">${chatroom.chatroom.memberCount}</p>
+                        <h2 class="font-semibold">${currentChatroom.rname}</h2>
+                        <p class="text-xs text-gray-medium">${currentChatroom.memberCount} 成员</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -126,23 +134,13 @@
                     </div>
                 </div>
 
-                <div class="flex items-end mb-4 message-animation">
-                    <img src="https://picsum.photos/id/1062/100/100" alt="李四" class="w-8 h-8 rounded-full mr-2">
-                    <div class="message-in p-3 max-w-[80%] shadow-sm">
-                        <div class="flex items-center mb-1">
-                            <h4 class="font-medium text-purple-600">李四</h4>
-                            <span class="text-xs text-gray-medium ml-2">12:17 PM</span>
-                        </div>
-                        <p>是的，我一直在研究它们。新的钩子非常强大！</p>
-                    </div>
-                </div>
 
                 <!-- 我的消息 -->
                 <div class="flex items-end justify-end mb-4 message-animation">
                     <div class="message-out p-3 max-w-[80%] shadow-sm">
                         <div class="flex items-center justify-end mb-1">
                             <span class="text-xs text-gray-medium mr-2">12:30 PM</span>
-                            <h4 class="font-medium text-dark">你</h4>
+                            <h4 class="font-medium text-dark">David</h4>
                         </div>
                         <p>我昨天刚升级了我的项目，目前运行得很好！</p>
                     </div>
@@ -162,7 +160,7 @@
         <!-- 右侧成员列表 hidden xl:block-->
         <aside class="members-list bg-white ">
             <div class="m-2 text-xs text-gray-medium bg-gray-100 rounded p-2" id="chatroom-desc">
-                ${chatroom.chatroom.description}
+                ${currentChatroom.description}
             </div>
             <!-- 成员列表头部 -->
             <div class="p-4 border-b border-gray-light">
@@ -177,72 +175,35 @@
             </div>
 
             <!-- 在线成员 -->
-            <%--            <div class="p-3 border-b border-gray-light">--%>
-            <%--                <h3 class="text-xs font-medium text-gray-medium mb-2">在线</h3>--%>
-            <%--                <div class="space-y-3">--%>
-            <%--                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
-            <%--                        <div class="relative mr-3">--%>
-            <%--                            <img src="https://picsum.photos/id/64/100/100" alt="你"--%>
-            <%--                                 class="w-10 h-10 rounded-full object-cover">--%>
-            <%--                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>--%>
-            <%--                        </div>--%>
-            <%--                        <div>--%>
-            <%--                            <h4 class="font-medium">你</h4>--%>
-            <%--                            <p class="text-xs text-gray-medium">在线</p>--%>
-            <%--                        </div>--%>
-            <%--                    </div>--%>
-
-            <%--                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
-            <%--                        <div class="relative mr-3">--%>
-            <%--                            <img src="https://picsum.photos/id/1027/100/100" alt="张三"--%>
-            <%--                                 class="w-10 h-10 rounded-full object-cover">--%>
-            <%--                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>--%>
-            <%--                        </div>--%>
-            <%--                        <div>--%>
-            <%--                            <h4 class="font-medium">张三</h4>--%>
-            <%--                            <p class="text-xs text-gray-medium">在线</p>--%>
-            <%--                        </div>--%>
-            <%--                    </div>--%>
-
-            <%--                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
-            <%--                        <div class="relative mr-3">--%>
-            <%--                            <img src="https://picsum.photos/id/338/100/100" alt="王五"--%>
-            <%--                                 class="w-10 h-10 rounded-full object-cover">--%>
-            <%--                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-300 rounded-full border-2 border-white"></span>--%>
-            <%--                        </div>--%>
-            <%--                        <div>--%>
-            <%--                            <h4 class="font-medium">王五</h4>--%>
-            <%--                            <p class="text-xs text-gray-medium">2小时前</p>--%>
-            <%--                        </div>--%>
-            <%--                    </div>--%>
-            <%--                </div>--%>
-            <%--            </div>--%>
-
-            <!-- 在线成员 -->
-<%--            <div class="p-3 border-b border-gray-light">--%>
-<%--                <h3 class="text-xs font-medium text-gray-medium mb-2">在线</h3>--%>
-<%--                <div class="space-y-3">--%>
-<%--                    <c:forEach items="${members}" var="member">--%>
-<%--                        <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
-<%--                            <div class="relative mr-3">--%>
-<%--                                <img src="static/avatar/${member.user.avatarUrl}" alt="${member.user.uname}"--%>
-<%--                                     class="w-10 h-10 rounded-full object-cover">--%>
-<%--                                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 ${member.user.status == 'online' ? 'bg-green-500' : 'bg-gray-300'} rounded-full border-2 border-white"></span>--%>
-<%--                            </div>--%>
-<%--                            <div>--%>
-<%--                                <h4 class="font-medium">${member.user.uname}</h4>--%>
-<%--                                <p class="text-xs text-gray-medium">--%>
-<%--                                    <c:choose>--%>
-<%--                                        <c:when test="${member.user.status == 'online'}">在线</c:when>--%>
-<%--                                        <c:otherwise>${fmt:formatDate(member.user.lastActive, pattern='HH:mm')}</c:otherwise>--%>
-<%--                                    </c:choose>--%>
-<%--                                </p>--%>
-<%--                            </div>--%>
-<%--                        </div>--%>
-<%--                    </c:forEach>--%>
-<%--                </div>--%>
-<%--            </div>--%>
-
+            <div class="p-3 border-b border-gray-light">
+                <h3 class="text-xs font-medium text-gray-medium mb-2">成员列表</h3>
+                <div class="space-y-3">
+                    <c:forEach items="${members}" var="member">
+                        <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                            <div class="relative mr-3">
+                                <img src="static/avatar/${member.user.avatarUrl}" alt="${member.user.uname}"
+                                     class="w-10 h-10 rounded-full object-cover">
+                                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 ${member.user.status == 'online' ? 'bg-green-500' : 'bg-gray-300'} rounded-full border-2 border-white"></span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">${member.user.uname}
+                                    <c:if test="${member.user.id == currentChatroom.creator}">
+                                        <span class="text-xs bg-blue-100 text-blue-800 px-1 rounded">创建者</span>
+                                    </c:if>
+                                </h4>
+                                <p class="text-xs text-gray-medium">
+                                    <c:choose>
+                                        <c:when test="${member.user.status == 'online'}">在线</c:when>
+                                        <c:otherwise>
+                                            最后活跃: ${member.user.lastActiveDisplay}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </p>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
         </aside>
     </main>
 </div>
