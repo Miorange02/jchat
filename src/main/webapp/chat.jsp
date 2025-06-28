@@ -62,7 +62,7 @@
             <div class="overflow-y-auto scrollbar-hide flex-1">
                 <!-- 活跃聊天室 -->
                 <c:forEach items="${chatrooms}" var="chatroom">
-                <div class="p-3 bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all hover:shadow-md hover:border-primary/30 group">
+                <div class="p-3 bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all hover:shadow-md hover:border-primary/8-0 group">
                     <div class="flex items-center space-x-3">
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-center">
@@ -177,76 +177,72 @@
             </div>
 
             <!-- 在线成员 -->
-            <div class="p-3 border-b border-gray-light">
-                <h3 class="text-xs font-medium text-gray-medium mb-2">在线</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div class="relative mr-3">
-                            <img src="https://picsum.photos/id/64/100/100" alt="你"
-                                 class="w-10 h-10 rounded-full object-cover">
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">你</h4>
-                            <p class="text-xs text-gray-medium">在线</p>
-                        </div>
-                    </div>
+            <%--            <div class="p-3 border-b border-gray-light">--%>
+            <%--                <h3 class="text-xs font-medium text-gray-medium mb-2">在线</h3>--%>
+            <%--                <div class="space-y-3">--%>
+            <%--                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
+            <%--                        <div class="relative mr-3">--%>
+            <%--                            <img src="https://picsum.photos/id/64/100/100" alt="你"--%>
+            <%--                                 class="w-10 h-10 rounded-full object-cover">--%>
+            <%--                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>--%>
+            <%--                        </div>--%>
+            <%--                        <div>--%>
+            <%--                            <h4 class="font-medium">你</h4>--%>
+            <%--                            <p class="text-xs text-gray-medium">在线</p>--%>
+            <%--                        </div>--%>
+            <%--                    </div>--%>
 
-                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div class="relative mr-3">
-                            <img src="https://picsum.photos/id/1027/100/100" alt="张三"
-                                 class="w-10 h-10 rounded-full object-cover">
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">张三</h4>
-                            <p class="text-xs text-gray-medium">在线</p>
-                        </div>
-                    </div>
+            <%--                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
+            <%--                        <div class="relative mr-3">--%>
+            <%--                            <img src="https://picsum.photos/id/1027/100/100" alt="张三"--%>
+            <%--                                 class="w-10 h-10 rounded-full object-cover">--%>
+            <%--                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>--%>
+            <%--                        </div>--%>
+            <%--                        <div>--%>
+            <%--                            <h4 class="font-medium">张三</h4>--%>
+            <%--                            <p class="text-xs text-gray-medium">在线</p>--%>
+            <%--                        </div>--%>
+            <%--                    </div>--%>
 
-                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div class="relative mr-3">
-                            <img src="https://picsum.photos/id/1062/100/100" alt="李四"
-                                 class="w-10 h-10 rounded-full object-cover">
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">李四</h4>
-                            <p class="text-xs text-gray-medium">在线</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <%--                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
+            <%--                        <div class="relative mr-3">--%>
+            <%--                            <img src="https://picsum.photos/id/338/100/100" alt="王五"--%>
+            <%--                                 class="w-10 h-10 rounded-full object-cover">--%>
+            <%--                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-300 rounded-full border-2 border-white"></span>--%>
+            <%--                        </div>--%>
+            <%--                        <div>--%>
+            <%--                            <h4 class="font-medium">王五</h4>--%>
+            <%--                            <p class="text-xs text-gray-medium">2小时前</p>--%>
+            <%--                        </div>--%>
+            <%--                    </div>--%>
+            <%--                </div>--%>
+            <%--            </div>--%>
 
-            <!-- 离线成员 -->
-            <div class="overflow-y-auto scrollbar-hide flex-1 p-3">
-                <h3 class="text-xs font-medium text-gray-medium mb-2">离线</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div class="relative mr-3">
-                            <img src="https://picsum.photos/id/338/100/100" alt="王五"
-                                 class="w-10 h-10 rounded-full object-cover">
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-300 rounded-full border-2 border-white"></span>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">王五</h4>
-                            <p class="text-xs text-gray-medium">2小时前</p>
-                        </div>
-                    </div>
+            <!-- 在线成员 -->
+<%--            <div class="p-3 border-b border-gray-light">--%>
+<%--                <h3 class="text-xs font-medium text-gray-medium mb-2">在线</h3>--%>
+<%--                <div class="space-y-3">--%>
+<%--                    <c:forEach items="${members}" var="member">--%>
+<%--                        <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">--%>
+<%--                            <div class="relative mr-3">--%>
+<%--                                <img src="static/avatar/${member.user.avatarUrl}" alt="${member.user.uname}"--%>
+<%--                                     class="w-10 h-10 rounded-full object-cover">--%>
+<%--                                <span class="absolute bottom-0 right-0 w-2.5 h-2.5 ${member.user.status == 'online' ? 'bg-green-500' : 'bg-gray-300'} rounded-full border-2 border-white"></span>--%>
+<%--                            </div>--%>
+<%--                            <div>--%>
+<%--                                <h4 class="font-medium">${member.user.uname}</h4>--%>
+<%--                                <p class="text-xs text-gray-medium">--%>
+<%--                                    <c:choose>--%>
+<%--                                        <c:when test="${member.user.status == 'online'}">在线</c:when>--%>
+<%--                                        <c:otherwise>${fmt:formatDate(member.user.lastActive, pattern='HH:mm')}</c:otherwise>--%>
+<%--                                    </c:choose>--%>
+<%--                                </p>--%>
+<%--                            </div>--%>
+<%--                        </div>--%>
+<%--                    </c:forEach>--%>
+<%--                </div>--%>
+<%--            </div>--%>
 
-                    <div class="flex items-center p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-                        <div class="relative mr-3">
-                            <img src="https://picsum.photos/id/91/100/100" alt="赵六"
-                                 class="w-10 h-10 rounded-full object-cover">
-                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-300 rounded-full border-2 border-white"></span>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">赵六</h4>
-                            <p class="text-xs text-gray-medium">5小时前</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </aside>
     </main>
 </div>

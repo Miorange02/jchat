@@ -30,7 +30,7 @@ public class LogoutServlet extends HttpServlet {
             request.getSession().invalidate();
 
             // 使用URL参数传递登出标识
-            response.sendRedirect(request.getContextPath() + "/login?logout=true");
+            response.sendRedirect(request.getContextPath() + "/login");
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "登出失败");

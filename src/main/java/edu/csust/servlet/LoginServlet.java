@@ -25,14 +25,12 @@ public class LoginServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        // 检查是否是登出后的重定向
-        boolean isAfterLogout = "true".equals(req.getParameter("logout"));
-
         String uname = req.getParameter("uname");
         String password = req.getParameter("password");
 
         // 如果是登出后的重定向，且没有提交登录表单，则不显示错误
-        if ((uname == null || password == null) && isAfterLogout) {
+        if ((uname == null || password == null)) {
+            req.removeAttribute("error");
             req.getRequestDispatcher("login.jsp").forward(req, resp);
             return;
         }
