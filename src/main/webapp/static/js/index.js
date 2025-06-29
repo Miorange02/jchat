@@ -1,15 +1,3 @@
-window.changeChatroom = function(roomId) {
-    // 如果是移动端视图，先关闭侧边栏
-    if (window.innerWidth < 1024) {
-        document.querySelector('.sidebar').classList.add('hidden');
-        document.querySelector('.sidebar').classList.remove('lg:block');
-        document.querySelector('.chat-area').classList.add('lg:w-full');
-        document.querySelector('.chat-area').classList.remove('lg:w-2/4');
-    }
-
-    // 跳转到新聊天室
-    window.location.href = "/chat?chatroomId=" + roomId;
-}
 tailwind.config = {
     theme: {
         extend: {
@@ -28,114 +16,176 @@ tailwind.config = {
     }
 }
 
+// 全局函数：切换聊天室（已存在）
+window.changeChatroom = function(roomId) {
+    // 移动端关闭侧边栏
+    if (window.innerWidth < 1024) {
+        document.querySelector('.sidebar').classList.add('hidden');
+        document.querySelector('.chat-area').classList.add('lg:w-full');
+    }
+    window.location.href = "/chat?chatroomId=" + roomId;
+};
+
+// 全局函数：加入聊天室（已调整）
+window.joinChatroom = function(chatroomId) {
+    if (!confirm("确定要加入该聊天室吗？")) return;
+
+    $.ajax({
+        url: "/chatroom",
+        type: "POST",
+        data: {
+            action: "join",
+            chatroomId: chatroomId
+        },
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                // 调用全局函数动态添加聊天室到侧边栏
+                window.addChatroomToSidebar(response.chatroom);
+                alert("加入成功！");
+            } else {
+                alert("加入失败：" + response.message);
+            }
+        },
+        error: function(xhr) {
+            alert("网络请求失败：" + xhr.responseText);
+        }
+    });
+};
+
+// 全局函数：退出当前聊天室
+window.exitChatroom = function() {
+    if (!confirm("确定要退出当前聊天室吗？退出后将无法接收该聊天室消息")) return;
+
+    $.ajax({
+        url: "/chatroom",
+        type: "POST",
+        data: {
+            action: "exit",
+            chatroomId: currentChatroomId
+        },
+        dataType: "json",
+        success: function(response) {
+            if (response.success) {
+                alert("退出成功！");
+                // 跳转到聊天首页（会自动加载用户加入的其他聊天室）
+                window.location.href = "/chat";
+            } else {
+                alert("退出失败：" + response.message);
+            }
+        },
+        error: function(xhr) {
+            alert("网络请求失败：" + xhr.responseText);
+        }
+    });
+};
+
+// 全局函数：动态添加聊天室到侧边栏（关键修复）
+window.addChatroomToSidebar = function(chatroom) {
+    const sidebar = document.querySelector('.sidebar .overflow-y-auto');
+    const chatroomItem = document.createElement('div');
+    chatroomItem.className = 'p-3 bg-white rounded-lg shadow-sm border border-gray-100 cursor-pointer transition-all hover:shadow-md hover:border-primary/80 chatroom-item';
+    chatroomItem.dataset.roomId = chatroom.id;
+    chatroomItem.innerHTML = `
+        <div class="flex items-center space-x-3">
+            <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-semibold text-gray-800 truncate">${chatroom.rname}</h3>
+                    <span class="text-xs text-gray-400">${chatroom.memberCount}人</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1 flex items-center">
+                    <i class="fa fa-user-circle mr-1 text-gray-400"></i>
+                    <span class="truncate">创建者：${chatroom.creatorName}</span>  <!-- 需后端返回创建者名称 -->
+                </p>
+            </div>
+        </div>
+    `;
+    // 绑定点击跳转事件
+    chatroomItem.addEventListener('click', function() {
+        window.changeChatroom(chatroom.id);
+    });
+    sidebar.appendChild(chatroomItem);
+};
+
+// DOM 加载完成后初始化交互
 document.addEventListener('DOMContentLoaded', function() {
+    // 关闭公告板
     const closeButton = document.getElementById('close-ann-board');
     const annBoardContainer = document.getElementById('ann-board-container');
-
+    const exitBtn = document.getElementById('exit-chatroom-btn');
+    if (exitBtn) {
+        exitBtn.addEventListener('click', window.exitChatroom);
+    }
     if (closeButton && annBoardContainer) {
-        closeButton.addEventListener('click', function() {
-            // 点击关闭按钮隐藏公告板
-            annBoardContainer.style.display = 'none';
-        });
+        closeButton.addEventListener('click', () => annBoardContainer.style.display = 'none');
     }
-});
 
-// 模拟消息发送功能
-document.getElementById('message-input').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        const message = this.value.trim();
-        if (message) {
-            // 添加新消息到聊天区域
-            const chatMessages = document.getElementById('chat-messages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'flex items-end justify-end mb-4 message-animation';
-            messageDiv.innerHTML = `
-                    <div class="message-out p-3 max-w-[80%] shadow-sm">
-                        <div class="flex items-center justify-end mb-1">
-                            <span class="text-xs text-gray-medium mr-2">刚刚</span>
-                            <h4 class="font-medium text-dark">你</h4>
-                        </div>
-                        <p>${message}</p>
-                    </div>
-                `;
-            chatMessages.appendChild(messageDiv);
-
-            // 清空输入框
-            this.value = '';
-
-            // 滚动到底部
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // 模拟其他成员回复
-            setTimeout(() => {
-                const replies = [
-                    '这个观点很有意思！',
-                    '我同意你的看法。',
-                    '感谢分享！',
-                    '你能详细说明一下吗？',
-                    '很棒的见解！',
-                    '我有类似的经验。',
-                    '其他人怎么看？'
-                ];
-                const randomReply = replies[Math.floor(Math.random() * replies.length)];
-
-                const replyDiv = document.createElement('div');
-                replyDiv.className = 'flex items-end mb-4 message-animation';
-                replyDiv.innerHTML = `
-                        <img src="https://picsum.photos/id/1027/100/100" alt="张三" class="w-8 h-8 rounded-full mr-2">
-                        <div class="message-in p-3 max-w-[80%] shadow-sm">
-                            <div class="flex items-center mb-1">
-                                <h4 class="font-medium text-primary">张三</h4>
-                                <span class="text-xs text-gray-medium ml-2">刚刚</span>
-                            </div>
-                            <p>${randomReply}</p>
-                        </div>
-                    `;
-                chatMessages.appendChild(replyDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 2000);
-        }
-    }
-});
-
-// 移动端菜单切换
-document.getElementById('sidebar-toggle').addEventListener('click', function () {
-    document.querySelector('.sidebar').classList.toggle('hidden');
-    document.querySelector('.sidebar').classList.toggle('lg:block');
-    document.querySelector('.chat-area').classList.toggle('lg:w-2/4');
-    document.querySelector('.chat-area').classList.toggle('lg:w-full');
-});
-
-document.getElementById('back-btn').addEventListener('click', function () {
-    document.querySelector('.sidebar').classList.toggle('hidden');
-    document.querySelector('.sidebar').classList.toggle('lg:block');
-    document.querySelector('.chat-area').classList.toggle('lg:w-2/4');
-    document.querySelector('.chat-area').classList.toggle('lg:w-full');
-});
-
-// 添加在 index.js 底部
-function changeChatroom(roomId) {
-    window.location.href = "/chat?chatroomId=" + roomId;
-}
-
-// 初始化聊天室数据
-document.addEventListener('DOMContentLoaded', function() {
-    // 获取当前聊天室ID
+    // 高亮当前聊天室（需 HTML 中 chatroom-item 类）
     const currentChatroomId = window.currentChatroomId || 0;
-    const currentUserId = window.currentUserId || 0;
-
-    // 高亮显示当前聊天室
     document.querySelectorAll('.chatroom-item').forEach(item => {
         if (parseInt(item.dataset.roomId) === currentChatroomId) {
-            item.classList.add('active-chatroom');
+            item.classList.add('bg-blue-50', 'border-primary');
         }
     });
 
-    // 移动端返回按钮事件
-    document.getElementById('back-btn').addEventListener('click', function() {
-        document.querySelector('.sidebar').classList.toggle('hidden');
-        document.querySelector('.sidebar').classList.toggle('lg:block');
-        document.querySelector('.chat-area').classList.toggle('lg:w-2/4');
-        document.querySelector('.chat-area').classList.toggle('lg:w-full');
-    });
+    // 创建聊天室模态框
+    const createBtn = document.getElementById('create-chatroom-btn');
+    const createModal = document.getElementById('create-modal');
+    const cancelCreate = document.getElementById('cancel-create');
+    if (createBtn) {
+        createBtn.addEventListener('click', () => createModal.classList.remove('hidden'));
+    }
+    if (cancelCreate) {
+        cancelCreate.addEventListener('click', () => createModal.classList.add('hidden'));
+    }
+    if (createModal) {
+        createModal.addEventListener('click', (e) => {
+            if (e.target === createModal) createModal.classList.add('hidden');
+        });
+    }
+
+    // 移动端侧边栏切换
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const backBtn = document.getElementById('back-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const chatArea = document.querySelector('.chat-area');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            chatArea.classList.toggle('lg:w-full');
+        });
+    }
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            chatArea.classList.toggle('lg:w-full');
+        });
+    }
+
+    // 消息发送（模拟功能，需结合后端接口）
+    const messageInput = document.getElementById('message-input');
+    if (messageInput) {
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const message = this.value.trim();
+                if (message) {
+                    // 模拟添加消息到聊天区域
+                    const chatMessages = document.getElementById('chat-messages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'flex items-end justify-end mb-4 message-animation';
+                    messageDiv.innerHTML = `
+                        <div class="message-out p-3 max-w-[80%] shadow-sm">
+                            <div class="flex items-center justify-end mb-1">
+                                <span class="text-xs text-gray-medium mr-2">刚刚</span>
+                                <h4 class="font-medium text-dark">你</h4>
+                            </div>
+                            <p>${message}</p>
+                        </div>
+                    `;
+                    chatMessages.appendChild(messageDiv);
+                    this.value = '';
+                }
+            }
+        });
+    }
 });

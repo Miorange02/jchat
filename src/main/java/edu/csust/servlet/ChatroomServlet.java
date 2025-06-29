@@ -16,12 +16,16 @@ import java.util.List;
 public class ChatroomServlet extends HttpServlet {
     private ChatService chatService = new ChatService();
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json;charset=UTF-8");  // 返回 JSON
 
         User user = (User) request.getSession().getAttribute("user");
         if (user == null) {
-            response.sendRedirect("/login");
+            response.getWriter().write("{\"success\":false, \"message\":\"未登录\"}");
             return;
         }
 
@@ -31,28 +35,69 @@ public class ChatroomServlet extends HttpServlet {
                 handleCreate(request, response, user.getId());
             } else if ("search".equals(action)) {
                 handleSearch(request, response);
+            } else if ("join".equals(action)) {
+                handleJoin(request, response, user.getId());
+            } else if ("exit".equals(action)) {  // 新增退出群聊处理
+                handleExit(request, response, user.getId());
             }
         } catch (Exception e) {
-            request.setAttribute("error", "操作失败: " + e.getMessage());
-            request.getRequestDispatcher("/chat.jsp").forward(request, response);
+            e.printStackTrace();
+            response.getWriter().write("{\"success\":false, \"message\":\"" + e.getMessage() + "\"}");
         }
     }
 
-    private void handleCreate(HttpServletRequest request, HttpServletResponse response, int creatorId)
-        throws Exception {
+    private void handleCreate(HttpServletRequest request, HttpServletResponse response, int creatorId) throws Exception {
         Chatroom chatroom = new Chatroom();
         chatroom.setRname(request.getParameter("rname"));
         chatroom.setDescription(request.getParameter("description"));
-
-        int roomId = chatService.createChatroom(chatroom);
+        chatroom.setCreator(creatorId);
+        int roomId = chatService.createChatroom(chatroom, creatorId);
         response.sendRedirect("/chat?chatroomId=" + roomId);
     }
 
-    private void handleSearch(HttpServletRequest request, HttpServletResponse response)
-        throws Exception {
+    private void handleSearch(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String keyword = request.getParameter("keyword");
         List<Chatroom> results = chatService.searchChatrooms(keyword);
         request.setAttribute("searchResults", results);
         request.getRequestDispatcher("/chat.jsp").forward(request, response);
+    }
+
+    private void handleJoin(HttpServletRequest request, HttpServletResponse response, int userId) throws Exception {
+        int chatroomId = Integer.parseInt(request.getParameter("chatroomId"));
+        chatService.joinChatroom(userId, chatroomId);
+        Chatroom chatroom = chatService.getChatroomById(chatroomId);
+        String json = String.format(
+                "{\"success\":true, \"message\":\"加入成功\", \"chatroom\":{\"id\":%d, \"rname\":\"%s\", \"memberCount\":%d}}",
+                chatroom.getId(),
+                chatroom.getRname(),
+                chatroom.getMemberCount()
+        );
+        response.getWriter().write(json);
+    }
+
+    // 新增：处理退出群聊逻辑
+    private void handleExit(HttpServletRequest request, HttpServletResponse response, int userId) throws Exception {
+        int chatroomId = Integer.parseInt(request.getParameter("chatroomId"));
+
+        // 检查用户是否在聊天室中
+        if (!chatService.isUserInRoom(userId, chatroomId)) {
+            response.getWriter().write("{\"success\":false, \"message\":\"您不在该聊天室中\"}");
+            return;
+        }
+
+        // 检查是否是创建者（不允许退出）
+        Chatroom chatroom = chatService.getChatroomById(chatroomId);
+        if (chatroom.getCreator() == userId) {
+            response.getWriter().write("{\"success\":false, \"message\":\"创建者不能退出聊天室\"}");
+            return;
+        }
+
+        // 执行退出操作（删除关联记录）
+        int affectedRows = chatService.removeUserFromRoom(userId, chatroomId);
+        if (affectedRows > 0) {
+            response.getWriter().write("{\"success\":true, \"message\":\"退出成功\"}");
+        } else {
+            response.getWriter().write("{\"success\":false, \"message\":\"退出失败\"}");
+        }
     }
 }

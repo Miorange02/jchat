@@ -2,8 +2,8 @@ package edu.csust.dao;
 
 import edu.csust.entity.Chatroom;
 import edu.csust.util.DBHelper;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,10 +13,27 @@ public class ChatroomDao {
     // 创建聊天室
     public int create(Chatroom chatroom) throws SQLException {
         String sql = "INSERT INTO " + TABLE_NAME + " (rname, description, creator_id) VALUES (?, ?, ?)";
-        return DBHelper.executeUpdate(sql,
-            chatroom.getRname(),
-            chatroom.getDescription(),
-            chatroom.getCreator());
+        Connection connection = DBHelper.getConnection();
+        PreparedStatement statement = null;
+        ResultSet generatedKeys = null;
+        try {
+            // 关键修改：设置返回自动生成的主键
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1, chatroom.getRname());
+            statement.setString(2, chatroom.getDescription());
+            statement.setInt(3, chatroom.getCreator());
+            statement.executeUpdate();
+
+            // 获取生成的主键ID
+            generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                return generatedKeys.getInt(1); // 返回数据库生成的自增ID
+            } else {
+                throw new SQLException("创建聊天室失败，未获取到自增ID");
+            }
+        } finally {
+            DBHelper.close(generatedKeys, statement, connection);
+        }
     }
 
     // 根据ID查询聊天室

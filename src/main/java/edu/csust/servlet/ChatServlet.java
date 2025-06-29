@@ -29,10 +29,15 @@ public class ChatServlet extends HttpServlet {
             List<ChatroomUser> chatrooms = chatService.getUserChatrooms(currentUser.getId());
             int chatroomId = getChatroomIdFromRequest(request, chatrooms);
 
-            // 获取当前聊天室对象
-            Chatroom currentChatroom = chatService.getChatroomById(chatroomId);
-            List<ChatroomUser> members = chatService.getChatroomMembers(chatroomId);
-            List<Message> messages = chatService.getChatroomMessages(chatroomId);
+            // 关键修改：若未找到聊天室ID（如搜索页），默认设为0
+            if (chatroomId == -1) { // 假设 getChatroomIdFromRequest 返回-1表示未找到
+                chatroomId = 0;
+            }
+
+            // 获取当前聊天室对象（若 chatroomId=0，可能返回null，需处理）
+            Chatroom currentChatroom = chatroomId != 0 ? chatService.getChatroomById(chatroomId) : null;
+            List<ChatroomUser> members = chatroomId != 0 ? chatService.getChatroomMembers(chatroomId) : null;
+            List<Message> messages = chatroomId != 0 ? chatService.getChatroomMessages(chatroomId) : null;
 
             // 设置请求属性
             request.setAttribute("chatrooms", chatrooms);

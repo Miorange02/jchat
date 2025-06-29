@@ -14,7 +14,7 @@ public class ChatroomUserDao {
 
     // 添加用户到聊天室
     public int addUserToRoom(int userId, int roomId) throws SQLException {
-        String sql = "INSERT INTO " + TABLE_NAME + " (user_id, room_id) VALUES (?, ?)";
+        String sql = "INSERT INTO chatroom_user (user_id, room_id) VALUES (?, ?)";
         return DBHelper.executeUpdate(sql, userId, roomId);
     }
 

@@ -8,7 +8,7 @@ public class DBHelper {
     static String databaseName = "jchat";
     static  String username = "root";
     static String password = "123456";
-    static String url = "jdbc:mysql://localhost:3306/" + databaseName + "?characterEncoding=utf-8";
+    static String url = "jdbc:mysql://localhost:3306/" + databaseName + "?characterEncoding=utf-8&serverTimezone=Asia/Shanghai";
 
     // 静态代码块，当类被加载的时候会调用，只会调用一次
     static{

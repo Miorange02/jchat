@@ -22,12 +22,12 @@ public class ChatService {
         List<ChatroomUser> chatroomUsers = chatroomUserDao.findByUserId(userId);
 
         // 确保关联对象已加载
-        for(ChatroomUser cu : chatroomUsers) {
-            if(cu.getChatroom() == null) {
+        for (ChatroomUser cu : chatroomUsers) {
+            if (cu.getChatroom() == null) {
                 Chatroom chatroom = chatroomDao.findById(cu.getRoomId());
                 cu.setChatroom(chatroom);
             }
-            if(cu.getUser() == null) {
+            if (cu.getUser() == null) {
                 User user = userDao.findById(cu.getUserId());
                 cu.setUser(user);
             }
@@ -46,8 +46,10 @@ public class ChatService {
     }
 
     // 创建新聊天室
-    public int createChatroom(Chatroom chatroom) throws Exception {
-        return chatroomDao.create(chatroom);
+    public int createChatroom(Chatroom chatroom, int creatorId) throws Exception {
+        int roomId = chatroomDao.create(chatroom);
+        chatroomUserDao.addUserToRoom(creatorId, roomId);
+        return roomId;
     }
 
     // 搜索聊天室
@@ -59,8 +61,20 @@ public class ChatService {
         return chatroomDao.findById(chatroomId);
     }
 
-    // 加入聊天室
     public int joinChatroom(int userId, int chatroomId) throws Exception {
+        // 1. 检查聊天室是否存在
+        Chatroom chatroom = chatroomDao.findById(chatroomId);
+        if (chatroom == null) {
+            throw new Exception("目标聊天室不存在");
+        }
+
+        // 2. 检查用户是否已加入该聊天室
+        boolean isAlreadyJoined = isUserInRoom(userId, chatroomId);
+        if (isAlreadyJoined) {
+            throw new Exception("您已加入该聊天室");
+        }
+
+        // 3. 执行加入操作（调用 DAO 层方法）
         return chatroomUserDao.addUserToRoom(userId, chatroomId);
     }
 
@@ -68,4 +82,21 @@ public class ChatService {
     public int sendMessage(Message message) throws Exception {
         return messageDao.insert(message);
     }
+
+    //检查用户是否在聊天室中
+    public boolean isUserInRoom(int userId, int chatroomId) throws Exception {
+        return chatroomUserDao.isUserInRoom(userId, chatroomId);
+    }
+
+    // 退出群聊
+    public int removeUserFromRoom(int userId, int chatroomId) {
+        try {
+            return chatroomUserDao.removeUserFromRoom(userId, chatroomId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
 }
+
