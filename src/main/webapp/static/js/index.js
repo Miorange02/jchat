@@ -162,30 +162,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 消息发送（模拟功能，需结合后端接口）
-    const messageInput = document.getElementById('message-input');
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const message = this.value.trim();
-                if (message) {
-                    // 模拟添加消息到聊天区域
-                    const chatMessages = document.getElementById('chat-messages');
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'flex items-end justify-end mb-4 message-animation';
-                    messageDiv.innerHTML = `
-                        <div class="message-out p-3 max-w-[80%] shadow-sm">
-                            <div class="flex items-center justify-end mb-1">
-                                <span class="text-xs text-gray-medium mr-2">刚刚</span>
-                                <h4 class="font-medium text-dark">你</h4>
-                            </div>
-                            <p>${message}</p>
-                        </div>
-                    `;
-                    chatMessages.appendChild(messageDiv);
-                    this.value = '';
-                }
-            }
-        });
-    }
 });

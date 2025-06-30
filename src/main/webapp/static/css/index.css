@@ -49,14 +49,18 @@ body {
 }
 
 /* 消息气泡样式 */
-.message-in {
-    background-color: white;
-    border-radius: 12px 12px 12px 0;
+/* 自己的消息气泡样式（绿色） */
+.message-out {
+    background-color: #e6f4ea; /* 浅绿背景 */
+    color: #155724; /* 深绿文字 */
+    margin-left: auto; /* 右对齐 */
 }
 
-.message-out {
-    background-color: #dcf8c6;
-    border-radius: 12px 12px 0 12px;
+/* 他人的消息气泡样式（白色） */
+.message-in {
+    background-color: #ffffff; /* 白色背景 */
+    color: #2d3748; /* 深灰文字 */
+    margin-right: auto; /* 左对齐 */
 }
 
 /* 动画效果 */

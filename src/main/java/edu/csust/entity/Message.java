@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @ToString
 @NoArgsConstructor
@@ -17,5 +17,7 @@ public class Message {
     private Integer userId;
     private String content;
     private String type = "text"; // "text" 或 "system"
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
+
+    private User user;
 }

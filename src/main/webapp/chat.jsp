@@ -1,6 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -14,9 +15,13 @@
     <script src="static/js/index.js"></script>
     <script>
         // 全局变量，用于JS访问
-        var currentUserId = ${not empty sessionScope.user ? sessionScope.user.id : 0};
+        var currentUserId = ${sessionScope.user.id};
+        var currentUserUname = "${sessionScope.user.uname}";
+        var currentUserAvatar = "${sessionScope.user.avatarUrl}"; // 假设头像路径在 static/avatar 下
         var currentChatroomId = ${currentChatroomId};
     </script>
+    <script type="module" src="static/js/ws.js"></script>
+    <script src="static/js/utils.js"></script>
 </head>
 <body class="bg-gray-light relative">
 <div class="shadow-2xl page-container w-2/3 mx-auto">
@@ -61,7 +66,8 @@
                                 value="${param.keyword}"
                         >
                         <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <a href="/chat" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors">
+                        <a href="/chat"
+                           class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors">
                             <i class="fa fa-times"></i>
                         </a>
                     </div>
@@ -69,7 +75,8 @@
             </div>
 
             <div class="p-3 border-b border-gray-light">
-                <button id="create-chatroom-btn" class="w-full py-2.5 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center">
+                <button id="create-chatroom-btn"
+                        class="w-full py-2.5 bg-primary text-white rounded-lg hover:bg-secondary transition-colors flex items-center justify-center">
                     <i class="fa fa-plus mr-2"></i> 创建新聊天室
                 </button>
             </div>
@@ -86,9 +93,9 @@
                                     </div>
                                     <!-- 修改按钮为 AJAX 触发（关键修改） -->
                                     <button onclick="joinChatroom(${result.id})"
-                                    class="ml-4 px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-secondary transition-colors"
+                                            class="ml-4 px-3 py-1.5 bg-primary text-white text-sm rounded-lg hover:bg-secondary transition-colors"
                                     >
-                                    加入
+                                        加入
                                     </button>
                                 </div>
                             </div>
@@ -148,39 +155,45 @@
 
             <!-- 聊天消息区域 -->
             <div class="flex-1 p-4 overflow-y-auto scrollbar-hide" id="chat-messages">
-
-                <!-- 系统消息 -->
-                <div class="flex justify-center mb-4">
-                    <div class="bg-gray-200 text-gray-medium text-xs px-3 py-1 rounded-full">
-                        你加入了聊天室
-                    </div>
-                </div>
-
-                <!-- 成员消息 -->
-                <div class="flex items-end mb-4 message-animation">
-                    <img src="https://picsum.photos/id/1027/100/100" alt="张三" class="w-8 h-8 rounded-full mr-2">
-                    <div class="message-in p-3 max-w-[80%] shadow-sm">
-                        <div class="flex items-center mb-1">
-                            <h4 class="font-medium text-primary">张三</h4>
-                            <span class="text-xs text-gray-medium ml-2">12:15 PM</span>
+                <c:forEach items="${messages}" var="msg">
+                    <!-- System messages -->
+                    <c:if test="${msg.type == 'system'}">
+                        <div class="mb-4 message-animation flex justify-center w-full">
+                            <div class="bg-gray-200 text-gray-600 text-sm px-3 py-1 rounded-full">
+                                    ${msg.content}
+                            </div>
                         </div>
-                        <p>早上好！有人看过React最新版本的新特性吗？</p>
-                    </div>
-                </div>
+                    </c:if>
 
+                    <!-- Regular messages -->
+                    <c:if test="${msg.type == 'text'}">
+                        <div class="mb-4 message-animation flex items-end ${msg.userId == currentUserId ? 'justify-end' : 'justify-start'}">
+                            <div class="flex items-start ${msg.userId == currentUserId ? 'flex-row-reverse' : ''}">
+                                <!-- Avatar -->
+                                <img src="static/avatar/${msg.user.avatarUrl}" alt="头像"
+                                     class="w-8 h-8 rounded-full object-cover ${msg.userId == currentUserId ? 'ml-3' : 'mr-3'}">
 
-                <!-- 我的消息 -->
-                <div class="flex items-end justify-end mb-4 message-animation">
-                    <div class="message-out p-3 max-w-[80%] shadow-sm">
-                        <div class="flex items-center justify-end mb-1">
-                            <span class="text-xs text-gray-medium mr-2">12:30 PM</span>
-                            <h4 class="font-medium text-dark">David</h4>
+                                <!-- Message bubble -->
+                                <div class="${msg.userId == currentUserId ? 'message-out bg-green-100 text-green-800' : 'message-in bg-white text-gray-800'}
+                               p-4 max-w-[70%] rounded-lg shadow-sm">
+                                    <div class="flex items-center ${msg.userId == currentUserId ? 'justify-end' : 'justify-start'} mb-1">
+                                        <c:if test="${msg.userId != currentUserId}">
+                                            <span class="font-medium text-base text-primary">${msg.user.uname}</span>
+                                        </c:if>
+                                        <span class="text-xs text-gray-500 mx-2">
+                                <script>document.write(formatTime('${msg.createdAt}'))</script>
+                            </span>
+                                        <c:if test="${msg.userId == currentUserId}">
+                                            <span class="font-medium text-base text-primary">${currentUser.uname}</span>
+                                        </c:if>
+                                    </div>
+                                    <p class="text-base">${msg.content}</p>
+                                </div>
+                            </div>
                         </div>
-                        <p>我昨天刚升级了我的项目，目前运行得很好！</p>
-                    </div>
-                </div>
+                    </c:if>
+                </c:forEach>
             </div>
-
             <!-- 消息输入区域 -->
             <div class="bg-white p-4 border-t border-gray-light">
                 <div class="flex items-center">
@@ -269,8 +282,11 @@
                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
             </div>
             <div class="flex justify-end">
-                <button type="button" id="cancel-create" class="mr-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100">取消</button>
-                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">创建</button>
+                <button type="button" id="cancel-create"
+                        class="mr-2 px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100">取消
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary">创建
+                </button>
             </div>
         </form>
     </div>

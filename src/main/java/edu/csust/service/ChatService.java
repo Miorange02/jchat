@@ -9,6 +9,8 @@ import edu.csust.entity.ChatroomUser;
 import edu.csust.entity.Message;
 import edu.csust.entity.User;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ChatService {
@@ -61,21 +63,34 @@ public class ChatService {
         return chatroomDao.findById(chatroomId);
     }
 
+    // 加入聊天室（新增系统消息逻辑）
     public int joinChatroom(int userId, int chatroomId) throws Exception {
-        // 1. 检查聊天室是否存在
+        // 1. 检查聊天室是否存在（原有逻辑）
         Chatroom chatroom = chatroomDao.findById(chatroomId);
         if (chatroom == null) {
             throw new Exception("目标聊天室不存在");
         }
 
-        // 2. 检查用户是否已加入该聊天室
+        // 2. 检查用户是否已加入（原有逻辑）
         boolean isAlreadyJoined = isUserInRoom(userId, chatroomId);
         if (isAlreadyJoined) {
             throw new Exception("您已加入该聊天室");
         }
 
-        // 3. 执行加入操作（调用 DAO 层方法）
-        return chatroomUserDao.addUserToRoom(userId, chatroomId);
+        // 3. 执行加入操作（原有逻辑）
+        int affectedRows = chatroomUserDao.addUserToRoom(userId, chatroomId);
+
+        // 新增：生成系统消息（用户加入）
+        if (affectedRows > 0) {
+            User user = userDao.findById(userId); // 获取用户信息
+            Message systemMsg = new Message();
+            systemMsg.setChatroomId(chatroomId);
+            systemMsg.setType("system"); // 标记为系统消息
+            systemMsg.setContent(user.getUname() + " 加入了聊天室");
+            systemMsg.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            messageDao.insert(systemMsg); // 保存到消息表
+        }
+        return affectedRows;
     }
 
     // 发送消息
@@ -91,7 +106,18 @@ public class ChatService {
     // 退出群聊
     public int removeUserFromRoom(int userId, int chatroomId) {
         try {
-            return chatroomUserDao.removeUserFromRoom(userId, chatroomId);
+            int affectedRows = chatroomUserDao.removeUserFromRoom(userId, chatroomId);
+            // 新增：生成系统消息（用户退出）
+            if (affectedRows > 0) {
+                User user = userDao.findById(userId);
+                Message systemMsg = new Message();
+                systemMsg.setChatroomId(chatroomId);
+                systemMsg.setType("system");
+                systemMsg.setContent(user.getUname() + " 退出了聊天室");
+                systemMsg.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+                messageDao.insert(systemMsg);
+            }
+            return affectedRows;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;

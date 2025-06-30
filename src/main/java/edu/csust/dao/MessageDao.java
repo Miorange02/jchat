@@ -1,6 +1,7 @@
 package edu.csust.dao;
 
 import edu.csust.entity.Message;
+import edu.csust.entity.User;
 import edu.csust.util.DBHelper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,11 +28,11 @@ public class MessageDao {
         return DBHelper.executeUpdate(sql, id);
     }
 
-    // 根据聊天室ID获取消息列表
-    public List<Message> findByChatroomId(int chatroomId) throws SQLException {
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE chatroom_id=? ORDER BY created_at ASC";
-        return DBHelper.query(sql, this::mapRow, chatroomId);
-    }
+//    // 根据聊天室ID获取消息列表
+//    public List<Message> findByChatroomId(int chatroomId) throws SQLException {
+//        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE chatroom_id=? ORDER BY created_at ASC";
+//        return DBHelper.query(sql, this::mapRow, chatroomId);
+//    }
 
     // 批量删除消息
     public int batchDelete(List<Integer> messageIds) throws SQLException {
@@ -67,6 +68,37 @@ public class MessageDao {
         return DBHelper.query(sql, this::mapRow, chatroomId, "%" + keyword + "%");
     }
 
+    // 根据聊天室ID获取消息列表（修改后）
+    public List<Message> findByChatroomId(int chatroomId) throws SQLException {
+        // 关键修改：JOIN user 表获取用户信息
+        String sql = "SELECT m.*, u.id as user_id, u.uname, u.avatar_url " +
+                "FROM message m " +
+                "LEFT JOIN user u ON m.user_id = u.id " +  // 关联用户表
+                "WHERE m.chatroom_id = ? " +
+                "ORDER BY m.created_at ASC";
+        return DBHelper.query(sql, this::mapRowWithUser, chatroomId);  // 使用新的映射方法
+    }
+
+    // 新增：行映射方法（包含用户信息）
+    private Message mapRowWithUser(ResultSet rs) throws SQLException {
+        Message message = new Message();
+        message.setId(rs.getInt("id"));
+        message.setChatroomId(rs.getInt("chatroom_id"));
+        message.setUserId(rs.getInt("user_id"));  // 原用户ID
+        message.setContent(rs.getString("content"));
+        message.setType(rs.getString("type"));
+        message.setCreatedAt(rs.getTimestamp("created_at"));
+
+        // 填充用户信息（新增）
+        User user = new User();
+        user.setId(rs.getInt("user_id"));  // 用户表的ID
+        user.setUname(rs.getString("uname"));  // 用户昵称
+        user.setAvatarUrl(rs.getString("avatar_url"));  // 用户头像
+        message.setUser(user);  // 关联用户对象
+
+        return message;
+    }
+
     // 行映射方法
     private Message mapRow(ResultSet rs) throws SQLException {
         Message message = new Message();
@@ -75,7 +107,7 @@ public class MessageDao {
         message.setUserId(rs.getInt("user_id"));
         message.setContent(rs.getString("content"));
         message.setType(rs.getString("type"));
-        message.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
+        message.setCreatedAt(rs.getTimestamp("created_at"));
         return message;
     }
 }
