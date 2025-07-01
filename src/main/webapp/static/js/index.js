@@ -16,7 +16,7 @@ tailwind.config = {
     }
 }
 
-// 全局函数：切换聊天室（已存在）
+// 全局函数：切换聊天室
 window.changeChatroom = function(roomId) {
     // 移动端关闭侧边栏
     if (window.innerWidth < 1024) {
@@ -26,7 +26,7 @@ window.changeChatroom = function(roomId) {
     window.location.href = "/chat?chatroomId=" + roomId;
 };
 
-// 全局函数：加入聊天室（已调整）
+// 全局函数：加入聊天室
 window.joinChatroom = function(chatroomId) {
     if (!confirm("确定要加入该聊天室吗？")) return;
 

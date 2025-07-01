@@ -5,7 +5,6 @@ import edu.csust.dao.ChatroomUserDao;
 import edu.csust.dao.ChatroomDao;
 import edu.csust.entity.Chatroom;
 import edu.csust.entity.User;
-import edu.csust.util.DBHelper;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;

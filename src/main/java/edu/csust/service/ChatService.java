@@ -43,7 +43,7 @@ public class ChatService {
         return chatroomUsers;
     }
 
-    // 获取聊天室成员（新增方法）
+    // 获取聊天室成员
     public List<ChatroomUser> getChatroomMembers(int roomId) throws Exception {
         return chatroomUserDao.findByRoomId(roomId);
     }
@@ -69,7 +69,7 @@ public class ChatService {
         return chatroomDao.findById(chatroomId);
     }
 
-    // 加入聊天室（新增系统消息逻辑）
+    // 加入聊天室
     public int joinChatroom(int userId, int chatroomId) throws Exception {
         // 1. 检查聊天室是否存在（原有逻辑）
         Chatroom chatroom = chatroomDao.findById(chatroomId);
@@ -77,16 +77,16 @@ public class ChatService {
             throw new Exception("目标聊天室不存在");
         }
 
-        // 2. 检查用户是否已加入（原有逻辑）
+        // 2. 检查用户是否已加入
         boolean isAlreadyJoined = isUserInRoom(userId, chatroomId);
         if (isAlreadyJoined) {
             throw new Exception("您已加入该聊天室");
         }
 
-        // 3. 执行加入操作（原有逻辑）
+        // 3. 执行加入操作
         int affectedRows = chatroomUserDao.addUserToRoom(userId, chatroomId);
 
-        // 新增：生成系统消息（用户加入）
+        // 新增：生成系统消息
         if (affectedRows > 0) {
             User user = userDao.findById(userId); // 获取用户信息
             Message systemMsg = new Message();
@@ -113,7 +113,7 @@ public class ChatService {
     public int removeUserFromRoom(int userId, int chatroomId) {
         try {
             int affectedRows = chatroomUserDao.removeUserFromRoom(userId, chatroomId);
-            // 新增：生成系统消息（用户退出）
+            // 生成系统消息（用户退出）
             if (affectedRows > 0) {
                 User user = userDao.findById(userId);
                 Message systemMsg = new Message();

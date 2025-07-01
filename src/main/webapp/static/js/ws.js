@@ -7,45 +7,50 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageInput = document.getElementById('message-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    // 新增：页面卸载时关闭 WebSocket 连接
+    // 页面卸载时关闭 WebSocket 连接
     window.addEventListener('beforeunload', function() {
         if (ws.readyState === WebSocket.OPEN) {
             ws.close(); // 主动关闭连接
         }
     });
 
-    // WebSocket 接收消息（渲染）
+    // WebSocket 接收消息
     ws.onmessage = function(event) {
         const message = JSON.parse(event.data);
         renderMessage(message);
     };
 
-    // 发送消息（按 Enter，修复无法发送问题）
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const content = this.value.trim();
-                if (content) {
-                    // 关键修改：用user对象替代单独的username和avatarUrl
-                    const message = {
-                        type: "text",
-                        content: content,
-                        userId: currentUserId,
-                        user: {  // 后端Message类的user字段需要这个结构
-                            id: currentUserId,
-                            uname: currentUserUname,  // 用户名放在user对象里
-                            avatarUrl: currentUserAvatar  // 头像路径也放在user对象里
-                        },
-                        chatroomId: currentChatroomId,
-                        createdAt: new Date().toISOString()
-                    };
-                    ws.send(JSON.stringify(message));
-                    this.value = '';
+    // 发送消息
+        if (messageInput) {
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (e.ctrlKey) {
+                        // Ctrl+Enter：允许换行（不阻止默认行为）
+                        return;
+                    } else {
+                        // 单独Enter：阻止默认换行，执行发送逻辑
+                        e.preventDefault();
+                        const content = this.value.trim();
+                        if (content) {
+                            const message = {
+                                type: "text",
+                                content: content,
+                                userId: currentUserId,
+                                user: {
+                                    id: currentUserId,
+                                    uname: currentUserUname,
+                                    avatarUrl: currentUserAvatar
+                                },
+                                chatroomId: currentChatroomId,
+                                createdAt: new Date().toISOString()
+                            };
+                            ws.send(JSON.stringify(message));
+                            this.value = '';
+                        }
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
 
     // 渲染消息
         function renderMessage(message) {
@@ -83,10 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
             }
 
+            //自动滚动到最新消息
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 }
-    //自动滚动到最新消息（最底部）
 
 );

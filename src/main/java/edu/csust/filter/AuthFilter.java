@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AuthFilter implements Filter {
-    // 允许访问的路径（新增/admin/login）
+    // 允许访问的路径
     private static final Set<String> ALLOWED_PATHS = new HashSet<>(Arrays.asList(
         "/login",
         "/register",

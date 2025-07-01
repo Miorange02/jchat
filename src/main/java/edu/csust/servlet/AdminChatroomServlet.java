@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 @WebServlet("/admin/updateChatroom")
 public class AdminChatroomServlet extends HttpServlet {
-    private final ChatroomService chatroomService = new ChatroomService(); // 假设已有ChatroomService
+    private final ChatroomService chatroomService = new ChatroomService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -24,7 +24,7 @@ public class AdminChatroomServlet extends HttpServlet {
             String rname = req.getParameter("rname");
             String description = req.getParameter("description");
 
-            // 更新聊天室（假设ChatroomService有update方法）
+            // 更新聊天室
             int success = chatroomService.updateChatroom(id, rname, description);
 
             if (success!=0) {

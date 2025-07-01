@@ -4,8 +4,6 @@
 <head>
   <meta charset="utf-8">
   <title>404 Error Example</title>
-  <meta http-equiv="refresh" content="60;url=&#x0068;&#x0074;&#x0074;&#x0070;&#x0073;&#x003a;&#x002f;&#x002f;&#x0077;&#x0077;&#x0077;&#x002e;&#x0071;&#x0071;&#x006d;&#x0075;&#x002e;&#x0063;&#x006f;&#x006d;">
-
   <style>@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700');
   @import url('https://fonts.googleapis.com/css?family=Catamaran:400,800');
   .error-container {
@@ -154,6 +152,7 @@
     margin-top: 50px;
     letter-spacing: 1px;
   }</style>
+  <link >
 </head>
 
 <body>
