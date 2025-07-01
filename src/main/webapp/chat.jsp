@@ -17,7 +17,7 @@
         // 全局变量，用于JS访问
         var currentUserId = ${sessionScope.user.id};
         var currentUserUname = "${sessionScope.user.uname}";
-        var currentUserAvatar = "${sessionScope.user.avatarUrl}"; // 假设头像路径在 static/avatar 下
+        var currentUserAvatar = "static/avatar/${sessionScope.user.avatarUrl}"; // 假设头像路径在 static/avatar 下
         var currentChatroomId = ${currentChatroomId};
     </script>
     <script type="module" src="static/js/ws.js"></script>
@@ -37,10 +37,11 @@
                 <img src="static/avatar/${sessionScope.user.avatarUrl}" alt="用户头像"
                      class="w-8 h-8 rounded-full object-cover border-2 border-white avatar-hover">
                 <span class="hidden md:inline-block font-semibold">${sessionScope.user.uname}</span>
-                <a href="#" class="nav-link">
-                    <i class="fa fa-cog nav-link-icon"></i>
-                    <span class="hidden md:inline-block">设置</span>
-                </a>
+                <c:if test="${sessionScope.user.uname == 'admin'}">
+                    <a href="admin" class="text-white hover:text-gray-200">
+                        <i class="fa fa-cog"></i> 管理后台
+                    </a>
+                </c:if>
                 <a href="logout" class="nav-link">
                     <i class="fa fa-sign-out nav-link-icon"></i>
                     <span class="hidden md:inline-block">登出</span>
@@ -167,24 +168,24 @@
 
                     <!-- Regular messages -->
                     <c:if test="${msg.type == 'text'}">
-                        <div class="mb-4 message-animation flex items-end ${msg.userId == currentUserId ? 'justify-end' : 'justify-start'}">
-                            <div class="flex items-start ${msg.userId == currentUserId ? 'flex-row-reverse' : ''}">
+                        <div class="mb-4 message-animation flex w-full items-end ${msg.userId == sessionScope.user.id ? 'justify-end' : 'justify-start'}">
+                            <div class="flex items-start ${msg.userId == sessionScope.user.id ? 'flex-row-reverse' : ''}">
                                 <!-- Avatar -->
                                 <img src="static/avatar/${msg.user.avatarUrl}" alt="头像"
-                                     class="w-8 h-8 rounded-full object-cover ${msg.userId == currentUserId ? 'ml-3' : 'mr-3'}">
+                                     class="w-8 h-8 rounded-full object-cover ${msg.userId == sessionScope.user.id ? 'ml-3' : 'mr-3'}">
 
                                 <!-- Message bubble -->
-                                <div class="${msg.userId == currentUserId ? 'message-out bg-green-100 text-green-800' : 'message-in bg-white text-gray-800'}
-                               p-4 max-w-[70%] rounded-lg shadow-sm">
-                                    <div class="flex items-center ${msg.userId == currentUserId ? 'justify-end' : 'justify-start'} mb-1">
-                                        <c:if test="${msg.userId != currentUserId}">
+                                <div class="${msg.userId == sessionScope.user.id ? 'message-out bg-green-100 text-green-800' : 'message-in bg-white text-gray-800'}
+                   p-4 max-w-[70%] rounded-lg shadow-sm">
+                                    <div class="flex items-center ${msg.userId == sessionScope.user.id ? 'justify-end' : 'justify-start'} mb-1">
+                                        <c:if test="${msg.userId != sessionScope.user.id}">
                                             <span class="font-medium text-base text-primary">${msg.user.uname}</span>
                                         </c:if>
                                         <span class="text-xs text-gray-500 mx-2">
-                                <script>document.write(formatTime('${msg.createdAt}'))</script>
-                            </span>
-                                        <c:if test="${msg.userId == currentUserId}">
-                                            <span class="font-medium text-base text-primary">${currentUser.uname}</span>
+                    <script>document.write(formatTime('${msg.createdAt}'))</script>
+                </span>
+                                        <c:if test="${msg.userId == sessionScope.user.id}">
+                                            <span class="font-medium text-base text-dark">${sessionScope.user.uname}</span>
                                         </c:if>
                                     </div>
                                     <p class="text-base">${msg.content}</p>
@@ -261,7 +262,7 @@
     </div>
     <div id="ann-board" class="max-h-64 overflow-y-auto">
         <!-- 公告内容动态插入 -->
-        示例公告内容，可根据实际情况更新。
+        Jchat是一个基于WebSocket的实时聊天应用，现处于测试开发阶段。
     </div>
 </div>
 

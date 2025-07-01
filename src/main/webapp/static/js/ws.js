@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </span>
                     ${isSelf ? `<h4 class="font-medium text-base text-dark">${currentUserUname}</h4>` : ''}
                 </div>
-                <p class="text-base">${message.content}</p>zz
+                <p class="text-base">${message.content}</p>
             </div>
         </div>
     `;

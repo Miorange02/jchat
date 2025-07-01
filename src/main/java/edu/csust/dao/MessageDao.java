@@ -50,6 +50,12 @@ public class MessageDao {
         return DBHelper.executeUpdate(sql, chatroomId);
     }
 
+    //获取所有聊天消息
+    public List<Message> findAll() throws SQLException {
+        String sql = "SELECT * FROM " + TABLE_NAME + " ORDER BY created_at ASC";
+        return DBHelper.query(sql, this::mapRow);
+    }
+
     // 获取用户在某聊天室的消息
     public List<Message> findByUserAndChatroom(int userId, int chatroomId) throws SQLException {
         String sql = "SELECT * FROM " + TABLE_NAME + " WHERE user_id=? AND chatroom_id=? ORDER BY created_at ASC";
@@ -68,7 +74,7 @@ public class MessageDao {
         return DBHelper.query(sql, this::mapRow, chatroomId, "%" + keyword + "%");
     }
 
-    // 根据聊天室ID获取消息列表（修改后）
+    // 根据聊天室ID获取消息列表
     public List<Message> findByChatroomId(int chatroomId) throws SQLException {
         // 关键修改：JOIN user 表获取用户信息
         String sql = "SELECT m.*, u.id as user_id, u.uname, u.avatar_url " +

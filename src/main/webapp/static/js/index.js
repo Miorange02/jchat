@@ -162,4 +162,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 新增：初始化滚动到底部
+    const scrollToBottom = () => {
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    };
+
+    // 立即执行一次
+    scrollToBottom();
+
+    // 添加500ms延迟确保动态内容加载完成
+    setTimeout(scrollToBottom, 500);
 });

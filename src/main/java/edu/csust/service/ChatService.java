@@ -9,6 +9,7 @@ import edu.csust.entity.ChatroomUser;
 import edu.csust.entity.Message;
 import edu.csust.entity.User;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,11 @@ public class ChatService {
     private ChatroomUserDao chatroomUserDao = new ChatroomUserDao();
     private MessageDao messageDao = new MessageDao();
     private UserDao userDao = new UserDao();
+
+    //获取所有聊天消息
+    public List<Message> getAllMessages() throws Exception {
+        return messageDao.findAll();
+    }
 
     // 获取用户可访问的聊天室列表
     public List<ChatroomUser> getUserChatrooms(int userId) throws Exception {
@@ -124,5 +130,8 @@ public class ChatService {
         }
     }
 
+    public List<Chatroom> getAllChatrooms() throws SQLException {
+        return chatroomDao.findAll();
+    }
 }
 

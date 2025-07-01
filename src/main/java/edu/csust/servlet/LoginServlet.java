@@ -39,6 +39,11 @@ public class LoginServlet extends HttpServlet {
             User user = authenticateUser(uname, password);
 
             if (user != null) {
+                // 管理员验证（通过数据库中的用户名判断）
+                if ("admin".equals(user.getUname())) {
+                    req.getSession().setAttribute("isAdmin", true);
+                }
+
                 userService.updateUserStatus(user, "online");
                 req.getSession().setAttribute("user", user);
                 resp.sendRedirect(req.getContextPath() + "/chat");

@@ -1,5 +1,6 @@
 package edu.csust.filter;
 
+import edu.csust.entity.User;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,46 +10,50 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AuthFilter implements Filter {
-    // Java 8兼容的初始化方式
+    // 允许访问的路径（新增/admin/login）
     private static final Set<String> ALLOWED_PATHS = new HashSet<>(Arrays.asList(
         "/login",
         "/register",
         "/static",
         "/login.jsp",
-        "/register.jsp"
+        "/register.jsp",
+        "/admin"
     ));
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-            throws IOException, ServletException {
+        throws IOException, ServletException {
+
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-
         String path = request.getRequestURI().substring(request.getContextPath().length());
 
-        // 检查是否为允许路径或已登录
-        boolean isAllowed = false;
-        for (String allowedPath : ALLOWED_PATHS) {
-            if (path.startsWith(allowedPath)) {
-                isAllowed = true;
-                break;
+        // 允许静态资源和登录注册页面
+        if (isAllowed(path)) {
+            chain.doFilter(req, res);
+            return;
+        }
+
+        // 管理员路径检查
+        if (path.startsWith("/admin")) {
+            User user = (User) request.getSession().getAttribute("user");
+            if (user == null || !"admin".equals(user.getUname())) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
+        }
+        // 普通用户检查
+        else {
+            if (request.getSession().getAttribute("user") == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
             }
         }
 
-        if (isAllowed || request.getSession().getAttribute("user") != null) {
-            chain.doFilter(req, res);
-        } else {
-            response.sendRedirect(request.getContextPath() + "/login");
-        }
+        chain.doFilter(req, res);
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // 初始化代码（如有需要）
-    }
-
-    @Override
-    public void destroy() {
-        // 清理代码（如有需要）
+    private boolean isAllowed(String path) {
+        return ALLOWED_PATHS.stream().anyMatch(path::startsWith);
     }
 }

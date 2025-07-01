@@ -1,10 +1,10 @@
 package edu.csust.dao;
 
+import edu.csust.entity.ChatroomUser;
 import edu.csust.entity.User;
 import edu.csust.util.DBHelper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,8 +42,24 @@ public class UserDao implements BaseDao<User> {
             user.getId());
     }
 
+    public boolean updateUser(User user) throws SQLException {
+        String sql = "UPDATE " + TABLE_NAME + " SET uname=?, email=?, password=? WHERE id=?";
+        int I = DBHelper.executeUpdate(sql,
+                user.getUname(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getId());
+        return I > 0;
+    }
+
     @Override
     public int delete(int id) throws SQLException {
+        ChatroomUserDao chatroomUserDao = new ChatroomUserDao();
+        List<ChatroomUser> byUserId = chatroomUserDao.findByUserId(id);
+        //循环删除
+        for (ChatroomUser chatroomUser : byUserId) {
+            chatroomUserDao.removeUserFromRoom(id, chatroomUser.getRoomId());
+        }
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id=?";
         return DBHelper.executeUpdate(sql, id);
     }
